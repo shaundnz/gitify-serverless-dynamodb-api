@@ -2,6 +2,8 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 
 const envVariables = {
+  DYNAMO_ENDPOINT: "",
+  DYNAMO_TABLE_NAME: "",
   SPOTIFY_CLIENT_ID: "",
   SPOTIFY_CLIENT_SECRET: "",
 };
