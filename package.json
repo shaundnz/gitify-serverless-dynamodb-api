@@ -28,6 +28,7 @@
     "@spotify/web-api-ts-sdk": "^1.1.2",
     "aws-cdk-lib": "2.101.0",
     "constructs": "^10.0.0",
-    "source-map-support": "^0.5.21"
+    "source-map-support": "^0.5.21",
+    "zod": "^3.22.4"
   }
 }
