@@ -5,5 +5,5 @@ export interface GetSinglePlaylistResponse {
   playlistVersions: {
     versionDate: Date;
     tracks: PlaylistedTrack[];
-  };
+  }[];
 }
