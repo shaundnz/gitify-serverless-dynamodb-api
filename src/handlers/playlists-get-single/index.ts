@@ -24,6 +24,7 @@ export const handler = async (
   }
 
   const playlistRepository = new PlaylistRepository(dynamo);
+
   const playlist = await playlistRepository.getSinglePlaylist(playlistId);
 
   if (playlist === null) {
