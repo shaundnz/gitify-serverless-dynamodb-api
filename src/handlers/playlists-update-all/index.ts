@@ -20,7 +20,7 @@ export const handler = async (
   if (!parseRes.success) {
     return {
       body: JSON.stringify({
-        message: "Playlist Ids must be list of strings",
+        message: "Playlist ids must be list of strings",
       }),
       statusCode: 400,
     };
