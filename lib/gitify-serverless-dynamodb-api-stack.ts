@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 
 const envVariables = {
   DYNAMO_ENDPOINT: "",
-  DYNAMO_TABLE_NAME: process.env.DYNAMO_TABLE_NAME,
+  DYNAMO_TABLE_NAME: process.env.DYNAMO_TABLE_NAME || "",
   SPOTIFY_CLIENT_ID: "",
   SPOTIFY_CLIENT_SECRET: "",
 };
