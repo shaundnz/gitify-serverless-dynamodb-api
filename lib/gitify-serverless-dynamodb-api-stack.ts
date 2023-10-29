@@ -2,10 +2,10 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 
 const envVariables = {
-  DYNAMO_ENDPOINT: "newendpoint.com",
+  DYNAMO_ENDPOINT: process.env.DYNAMO_ENDPOINT || "",
   DYNAMO_TABLE_NAME: process.env.DYNAMO_TABLE_NAME || "",
-  SPOTIFY_CLIENT_ID: "",
-  SPOTIFY_CLIENT_SECRET: "",
+  SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || "",
+  SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET || "",
 };
 
 export class GitifyServerlessDynamodbApiStack extends cdk.Stack {

@@ -38,4 +38,7 @@ jobs:
       - name: Deploy stack
         run: cdk deploy --all --require-approval never
         env:
+          DYNAMO_ENDPOINT: ${{ secrets.DYNAMO_ENDPOINT }}
           DYNAMO_TABLE_NAME: ${{ secrets.DYNAMO_TABLE_NAME }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
