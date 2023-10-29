@@ -57,7 +57,17 @@ export const handler = async (
         fetchedAllTracks = !playlistTracksRes.next;
       }
 
-      await playlistRepository.createPlaylistVersion(id, trackItems);
+      const shouldCreateNewVersion =
+        await playlistRepository.shouldCreateNewVersion(id, trackItems);
+
+      // If we do not create a new version, should still update the version date
+      // Gives better UX as user feels latest playlist version is up to date, rather
+      // than the last time a new version was created
+      if (shouldCreateNewVersion) {
+        await playlistRepository.createPlaylistVersion(id, trackItems);
+      } else {
+        await playlistRepository.updateLatestVersionDate(id);
+      }
 
       return playlistEntity;
     })
