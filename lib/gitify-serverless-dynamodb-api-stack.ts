@@ -6,6 +6,7 @@ const envVariables = {
   DYNAMO_TABLE_NAME: process.env.DYNAMO_TABLE_NAME || "",
   SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || "",
   SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET || "",
+  SECRET_API_KEY: process.env.SECRET_API_KEY || "",
 };
 
 export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
@@ -49,7 +50,7 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
 
     const api = new cdk.aws_apigateway.RestApi(this, "api", {
       defaultCorsPreflightOptions: {
-        allowOrigins: ["http://127.0.0.1:5173"],
+        allowOrigins: ["http://127.0.0.1:5173", "http://localhost:5173"],
       },
     });
     const playlists = api.root.addResource("playlists");

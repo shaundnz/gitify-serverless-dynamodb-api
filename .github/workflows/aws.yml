@@ -42,3 +42,4 @@ jobs:
           DYNAMO_TABLE_NAME: ${{ secrets.DYNAMO_TABLE_NAME }}
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SECRET_API_KEY: ${{ secrets.SECRET_API_KEY }}
