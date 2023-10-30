@@ -3,9 +3,13 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 export const authorizeIncomingRequest = (
   request: APIGatewayProxyEvent
 ): boolean => {
-  const apiKey = request.headers["X-Api-Key"];
+  const headerName = "X-API-Key";
+  const headers = Object.keys(request.headers);
+  const apiHeader = headers.find((key) => {
+    return key.toLocaleLowerCase() === headerName.toLocaleLowerCase();
+  });
 
-  if (!apiKey) return false;
+  if (!apiHeader) return false;
 
-  return apiKey === process.env.SECRET_API_KEY;
+  return request.headers[apiHeader] === process.env.SECRET_API_KEY;
 };
