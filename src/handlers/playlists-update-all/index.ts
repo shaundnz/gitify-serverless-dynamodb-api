@@ -44,6 +44,9 @@ export const handler = async (
     process.env.SPOTIFY_CLIENT_SECRET
   );
 
+  const newVersionCreated: string[] = [];
+  const noChange: string[] = [];
+
   await Promise.all(
     parseRes.data.map(async (id) => {
       const res = await sdk.playlists.getPlaylist(id, "US");
@@ -76,8 +79,10 @@ export const handler = async (
       // than the last time a new version was created
       if (shouldCreateNewVersion) {
         await playlistRepository.createPlaylistVersion(id, trackItems);
+        newVersionCreated.push(id);
       } else {
         await playlistRepository.updateLatestVersionDate(id);
+        noChange.push(id);
       }
 
       return playlistEntity;
@@ -87,6 +92,8 @@ export const handler = async (
   return {
     body: JSON.stringify({
       message: "Successful playlist-update-all lambda invocation",
+      updatedPlaylists: newVersionCreated,
+      noChange: noChange,
     }),
     statusCode: 201,
   };
