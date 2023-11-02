@@ -78,6 +78,14 @@ export const handler = async (
       // Gives better UX as user feels latest playlist version is up to date, rather
       // than the last time a new version was created
       if (shouldCreateNewVersion) {
+        // Empty the available market properties, these are unneeded and
+        // take a large amount of storage space
+        trackItems.forEach((item) => {
+          if ("track" in item.track) {
+            item.track.available_markets = [];
+            item.track.album.available_markets = [];
+          }
+        });
         await playlistRepository.createPlaylistVersion(id, trackItems);
         newVersionCreated.push(id);
       } else {
