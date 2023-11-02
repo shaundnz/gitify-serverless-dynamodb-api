@@ -49,7 +49,7 @@ export const handler = async (
 
   await Promise.all(
     parseRes.data.map(async (id) => {
-      const res = await sdk.playlists.getPlaylist(id, "US");
+      const res = await sdk.playlists.getPlaylist(id);
       const { tracks, ...playlistEntity } = res;
       await playlistRepository.updateSinglePlaylist(playlistEntity);
 
@@ -61,7 +61,7 @@ export const handler = async (
       while (!fetchedAllTracks) {
         const playlistTracksRes = await sdk.playlists.getPlaylistItems(
           id,
-          "US",
+          undefined,
           undefined,
           limit,
           offset
