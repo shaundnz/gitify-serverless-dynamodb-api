@@ -4,6 +4,7 @@ import {
   PutCommand,
   UpdateCommand,
   QueryCommand,
+  QueryCommandOutput,
 } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { Playlist, PlaylistedTrack } from "@spotify/web-api-ts-sdk";
@@ -47,11 +48,11 @@ export class PlaylistRepository {
 
     if (!playlist.Item) return null;
 
-    let lastEvaluatedKey: Record<string, any> | undefined = undefined;
     let playlistVersions: PlaylistVersion[] = [];
+    let lastEvaluatedKey: Record<string, any> | undefined = undefined;
 
     do {
-      const queryRes = await this.dynamo.send(
+      const queryRes: QueryCommandOutput = await this.dynamo.send(
         new QueryCommand({
           TableName: process.env.DYNAMO_TABLE_NAME,
           KeyConditionExpression:
@@ -64,8 +65,10 @@ export class PlaylistRepository {
             ":playlistPartitionKey": `Playlist#${playlistId}`,
             ":versionSortKey": "Version#",
           },
+          ExclusiveStartKey: lastEvaluatedKey,
         })
       );
+
       lastEvaluatedKey = queryRes.LastEvaluatedKey;
 
       queryRes.Items?.forEach((item) => {

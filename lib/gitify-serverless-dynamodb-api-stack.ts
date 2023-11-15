@@ -19,7 +19,7 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
       this,
       "playlists-get-all",
       {
-        timeout: cdk.Duration.seconds(20),
+        timeout: cdk.Duration.seconds(5),
         memorySize: 1024,
         entry: "src/handlers/playlists-get-all/index.ts",
         environment: envVariables,
@@ -30,7 +30,7 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
       this,
       "playlists-get-single",
       {
-        timeout: cdk.Duration.seconds(20),
+        timeout: cdk.Duration.seconds(5),
         memorySize: 1024,
         entry: "src/handlers/playlists-get-single/index.ts",
         environment: envVariables,
