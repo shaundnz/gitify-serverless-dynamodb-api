@@ -10,6 +10,7 @@ import { Playlist, PlaylistedTrack } from "@spotify/web-api-ts-sdk";
 import {
   GetAllPlaylistResponse,
   GetSinglePlaylistResponse,
+  PlaylistVersion,
 } from "../contracts";
 
 export class PlaylistRepository {
@@ -46,25 +47,35 @@ export class PlaylistRepository {
 
     if (!playlist.Item) return null;
 
-    const playlistVersions = await this.dynamo.send(
-      new QueryCommand({
-        TableName: process.env.DYNAMO_TABLE_NAME,
-        KeyConditionExpression:
-          "#PartitionKey = :playlistPartitionKey and begins_with(#SortKey, :versionSortKey)",
-        ExpressionAttributeNames: {
-          "#PartitionKey": "PartitionKey",
-          "#SortKey": "SortKey",
-        },
-        ExpressionAttributeValues: {
-          ":playlistPartitionKey": `Playlist#${playlistId}`,
-          ":versionSortKey": "Version#",
-        },
-      })
-    );
+    let lastEvaluatedKey: Record<string, any> | undefined = undefined;
+    let playlistVersions: PlaylistVersion[] = [];
+
+    do {
+      const queryRes = await this.dynamo.send(
+        new QueryCommand({
+          TableName: process.env.DYNAMO_TABLE_NAME,
+          KeyConditionExpression:
+            "#PartitionKey = :playlistPartitionKey and begins_with(#SortKey, :versionSortKey)",
+          ExpressionAttributeNames: {
+            "#PartitionKey": "PartitionKey",
+            "#SortKey": "SortKey",
+          },
+          ExpressionAttributeValues: {
+            ":playlistPartitionKey": `Playlist#${playlistId}`,
+            ":versionSortKey": "Version#",
+          },
+        })
+      );
+      lastEvaluatedKey = queryRes.LastEvaluatedKey;
+
+      queryRes.Items?.forEach((item) => {
+        playlistVersions.push(item.Data);
+      });
+    } while (lastEvaluatedKey !== undefined);
 
     return {
       playlist: playlist.Item.Data,
-      playlistVersions: playlistVersions.Items?.map((item) => item.Data),
+      playlistVersions: playlistVersions,
     } as GetSinglePlaylistResponse;
   }
 
