@@ -71,8 +71,15 @@ export const handler = async (
         fetchedAllTracks = !playlistTracksRes.next;
       }
 
+      // https://developer.spotify.com/documentation/web-api/reference/get-list-users-playlists
+      // Playlist tracks can be null if they have been removed
+      const tracksItemsNullsRemoved = trackItems.filter((t) => !!t.track);
+
       const shouldCreateNewVersion =
-        await playlistRepository.shouldCreateNewVersion(id, trackItems);
+        await playlistRepository.shouldCreateNewVersion(
+          id,
+          tracksItemsNullsRemoved
+        );
 
       // If we do not create a new version, should still update the version date
       // Gives better UX as user feels latest playlist version is up to date, rather
@@ -80,13 +87,16 @@ export const handler = async (
       if (shouldCreateNewVersion) {
         // Empty the available market properties, these are unneeded and
         // take a large amount of storage space
-        trackItems.forEach((item) => {
+        tracksItemsNullsRemoved.forEach((item) => {
           if ("track" in item.track) {
             item.track.available_markets = [];
             item.track.album.available_markets = [];
           }
         });
-        await playlistRepository.createPlaylistVersion(id, trackItems);
+        await playlistRepository.createPlaylistVersion(
+          id,
+          tracksItemsNullsRemoved
+        );
         newVersionCreated.push(id);
       } else {
         await playlistRepository.updateLatestVersionDate(id);
