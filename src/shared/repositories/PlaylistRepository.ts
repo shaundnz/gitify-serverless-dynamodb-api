@@ -7,11 +7,12 @@ import {
   QueryCommandOutput,
 } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
-import { Playlist, PlaylistedTrack } from "@spotify/web-api-ts-sdk";
+import { Playlist, PlaylistedTrack, Track } from "@spotify/web-api-ts-sdk";
 import {
   GetAllPlaylistResponse,
   GetSinglePlaylistResponse,
   PlaylistVersion,
+  PlaylistVersionMinified,
 } from "../contracts";
 
 export class PlaylistRepository {
@@ -76,10 +77,43 @@ export class PlaylistRepository {
       });
     } while (lastEvaluatedKey !== undefined);
 
+    const { playlistSongsMap, playlistVersions: playlistVersionsMinified } =
+      this.minifyPlaylistVersionsResponse(playlistVersions);
+
     return {
       playlist: playlist.Item.Data,
-      playlistVersions: playlistVersions,
+      playlistSongsMap: playlistSongsMap,
+      playlistVersions: playlistVersionsMinified,
     } as GetSinglePlaylistResponse;
+  }
+
+  minifyPlaylistVersionsResponse(
+    playlistVersions: PlaylistVersion[]
+  ): Omit<GetSinglePlaylistResponse, "playlist"> {
+    const playlistVersionsMinified: PlaylistVersionMinified[] = [];
+    const playlistSongsMap: { [id: string]: Track } = {};
+
+    playlistVersions.forEach((playlistVersion) => {
+      playlistVersionsMinified.push({
+        versionId: playlistVersion.versionId,
+        versionDate: playlistVersion.versionDate,
+        tracks: playlistVersion.tracks.map((playlistTrack) => ({
+          id: playlistTrack.track.id,
+          added_at: playlistTrack.added_at,
+        })),
+      });
+
+      playlistVersion.tracks.forEach((playlistTrack) => {
+        if (
+          "track" in playlistTrack.track &&
+          !playlistSongsMap.hasOwnProperty(playlistTrack.track.id)
+        ) {
+          playlistSongsMap[playlistTrack.track.id] = playlistTrack.track;
+        }
+      });
+    });
+
+    return { playlistSongsMap, playlistVersions: playlistVersionsMinified };
   }
 
   async updateSinglePlaylist(playlist: Omit<Playlist, "tracks">) {
@@ -127,8 +161,8 @@ export class PlaylistRepository {
 
     const latestVersionSongIdsSet = new Set<string>();
 
-    latestVersion.tracks.forEach((t) => {
-      latestVersionSongIdsSet.add(t.track.id);
+    latestVersion.tracks.forEach((track) => {
+      latestVersionSongIdsSet.add(track.id);
     });
 
     // If any tracks with ids that are not found in the set exist, something has changed

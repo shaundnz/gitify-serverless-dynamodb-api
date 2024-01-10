@@ -1,8 +1,22 @@
-import { Playlist, PlaylistedTrack } from "@spotify/web-api-ts-sdk";
+import { Playlist, PlaylistedTrack, Track } from "@spotify/web-api-ts-sdk";
 
 export interface GetSinglePlaylistResponse {
   playlist: Omit<Playlist, "tracks">[];
-  playlistVersions: PlaylistVersion[];
+  playlistVersions: PlaylistVersionMinified[];
+  playlistSongsMap: {
+    [id: string]: Track;
+  };
+}
+
+export interface PlaylistVersionMinified {
+  versionId: string;
+  versionDate: string;
+  tracks: MinifiedPlaylistVersionTrack[];
+}
+
+export interface MinifiedPlaylistVersionTrack {
+  id: string;
+  added_at: string;
 }
 
 export interface PlaylistVersion {
