@@ -15,6 +15,7 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
 
     // The code that defines your stack goes here
 
+    // Lambda Definitions
     const playlistsGetAllHandler = new cdk.aws_lambda_nodejs.NodejsFunction(
       this,
       "playlists-get-all",
@@ -48,6 +49,58 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
       }
     );
 
+    const playlistUpdateAllDummyHandler =
+      new cdk.aws_lambda_nodejs.NodejsFunction(
+        this,
+        "playlists-update-all-dummy",
+        {
+          timeout: cdk.Duration.seconds(120),
+          memorySize: 1024,
+          entry: "src/handlers/playlists-update-all-dummy/index.ts",
+          environment: envVariables,
+        }
+      );
+
+    const playlistTriggerUpdateAllJobHandler =
+      new cdk.aws_lambda_nodejs.NodejsFunction(
+        this,
+        "playlists-trigger-update-all-job",
+        {
+          timeout: cdk.Duration.seconds(15),
+          memorySize: 1024,
+          entry: "src/handlers/playlists-trigger-update-all-job/index.ts",
+          environment: envVariables,
+        }
+      );
+
+    const updatePlaylistsJobStatusHandler =
+      new cdk.aws_lambda_nodejs.NodejsFunction(
+        this,
+        "playlists-get-update-status",
+        {
+          timeout: cdk.Duration.seconds(15),
+          memorySize: 1024,
+          entry: "src/handlers/playlists-get-update-status/index.ts",
+          environment: envVariables,
+        }
+      );
+
+    // Step Function Definitions
+    const stateMachine = new cdk.aws_stepfunctions.StateMachine(
+      this,
+      "UpdatePlaylistsStateMachine",
+      {
+        definition: new cdk.aws_stepfunctions_tasks.LambdaInvoke(
+          this,
+          "UpdateAllPlaylistsTask",
+          {
+            lambdaFunction: playlistUpdateAllDummyHandler,
+          }
+        ).next(new cdk.aws_stepfunctions.Succeed(this, "UpdatedPlaylists")),
+      }
+    );
+
+    // API Gateway Definitions
     const api = new cdk.aws_apigateway.RestApi(this, "api", {
       defaultCorsPreflightOptions: {
         allowOrigins: ["http://127.0.0.1:5173", "http://localhost:5173"],
@@ -68,6 +121,13 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
     playlist.addMethod(
       "GET",
       new cdk.aws_apigateway.LambdaIntegration(playlistGetSingleHandler)
+    );
+
+    const jobStatus = api.root.addResource("jobstatus").addResource("{id}");
+
+    jobStatus.addMethod(
+      "GET",
+      new cdk.aws_apigateway.LambdaIntegration(updatePlaylistsJobStatusHandler)
     );
   }
 }
