@@ -1,3 +1,4 @@
+import { SFNClient, StartExecutionCommand } from "@aws-sdk/client-sfn";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { authorizeIncomingRequest } from "../../shared/auth/authorizeIncomingRequest";
 import { updatePlaylistRequestValidator } from "../../shared/contracts/validators";
@@ -8,6 +9,8 @@ import { UpdatePlaylistsJobStatusRepository } from "../../shared/repositories";
 const client = new DynamoDBClient({
   endpoint: process.env.DYNAMO_ENDPOINT,
 });
+
+const sfnClient = new SFNClient();
 
 const dynamo = DynamoDBDocumentClient.from(client);
 
@@ -43,6 +46,16 @@ export const handler = async (
     await updatePlaylistsJobStatusRepository.createJobStartedRecord();
 
   // Start the update job
+
+  const input = {
+    stateMachineArn: process.env.STATE_MACHINE_UPDATE_PLAYLISTS_ARN,
+    input: JSON.stringify({ jobId: jobId }),
+  };
+  const command = new StartExecutionCommand(input);
+
+  const res = sfnClient.send(command);
+
+  console.log(res);
 
   return {
     body: JSON.stringify({

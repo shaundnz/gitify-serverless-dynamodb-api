@@ -7,6 +7,8 @@ const envVariables = {
   SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || "",
   SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET || "",
   SECRET_API_KEY: process.env.SECRET_API_KEY || "",
+  STATE_MACHINE_UPDATE_PLAYLISTS_ARN:
+    process.env.STATE_MACHINE_UPDATE_PLAYLISTS_ARN || "",
 };
 
 export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
