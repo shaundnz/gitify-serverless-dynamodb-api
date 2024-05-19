@@ -53,7 +53,7 @@ export const handler = async (
   };
   const command = new StartExecutionCommand(input);
 
-  const res = sfnClient.send(command);
+  const res = await sfnClient.send(command);
 
   console.log(res);
 
