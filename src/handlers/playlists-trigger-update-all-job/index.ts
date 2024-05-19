@@ -51,11 +51,9 @@ export const handler = async (
     stateMachineArn: process.env.STATE_MACHINE_UPDATE_PLAYLISTS_ARN,
     input: JSON.stringify({ jobId: jobId, playlistIds: parseRes.data }),
   };
+
   const command = new StartExecutionCommand(input);
-
-  const res = await sfnClient.send(command);
-
-  console.log(res);
+  await sfnClient.send(command);
 
   return {
     body: JSON.stringify({

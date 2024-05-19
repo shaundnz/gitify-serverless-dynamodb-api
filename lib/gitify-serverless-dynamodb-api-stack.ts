@@ -96,7 +96,7 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
           this,
           "UpdateAllPlaylistsTask",
           {
-            lambdaFunction: playlistUpdateAllDummyHandler,
+            lambdaFunction: playlistUpdateAllHandler,
           }
         ).next(new cdk.aws_stepfunctions.Succeed(this, "UpdatedPlaylists")),
       }
@@ -116,7 +116,9 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
 
     playlists.addMethod(
       "POST",
-      new cdk.aws_apigateway.LambdaIntegration(playlistUpdateAllHandler)
+      new cdk.aws_apigateway.LambdaIntegration(
+        playlistTriggerUpdateAllJobHandler
+      )
     );
 
     const playlist = playlists.addResource("{id}");
