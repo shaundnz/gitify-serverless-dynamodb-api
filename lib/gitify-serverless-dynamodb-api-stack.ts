@@ -125,6 +125,14 @@ export class GitifyServerlessDynamodbApiStack extends cdk.Stack {
       new cdk.aws_apigateway.LambdaIntegration(playlistGetSingleHandler)
     );
 
+    const update = playlists.addResource("update");
+    update.addMethod(
+      "POST",
+      new cdk.aws_apigateway.LambdaIntegration(
+        playlistTriggerUpdateAllJobHandler
+      )
+    );
+
     const jobStatus = api.root.addResource("jobstatus").addResource("{id}");
 
     jobStatus.addMethod(

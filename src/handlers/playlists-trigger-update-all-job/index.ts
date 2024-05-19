@@ -49,7 +49,7 @@ export const handler = async (
 
   const input = {
     stateMachineArn: process.env.STATE_MACHINE_UPDATE_PLAYLISTS_ARN,
-    input: JSON.stringify({ jobId: jobId }),
+    input: JSON.stringify({ jobId: jobId, playlistIds: parseRes.data }),
   };
   const command = new StartExecutionCommand(input);
 
