@@ -43,6 +43,7 @@ export class UpdatePlaylistsJobStatusRepository {
         TableName: process.env.DYNAMO_TABLE_NAME,
         Key: {
           PartitionKey: `UpdatePlaylistJobStatus#${jobId}`,
+          SortKey: `UpdatePlaylistsJobStatus#`,
         },
         UpdateExpression:
           "SET #data.#status = :newStatus, #data.#lastUpdatedAt = :lastUpdatedAt",
